@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PixiJS Test</title>
+
+        <script src="js/pixi.js"></script>
+        <script src="js/pixiUtils.js"></script>
+
+        <script>
+            let app;
+
+            let rect1;
+            let rect2;
+            let rect3;
+
+            // pointer state
+            let pointerIsDown;
+            let pointerIsOver;
+
+            // colour tint constants
+            const NORMAL = 0xffffff;
+            const OVER = 0x00ff00;
+            const DOWN = 0xff0000;
+
+            window.onload = function () {
+                app = new PIXI.Application({
+                    width: 800,
+                    height: 600,
+                    backgroundColor: 0xaaaaaa,
+                });
+
+                document.querySelector("#gameDiv").appendChild(app.view);
+
+                // create rects
+                rect1 = createRect(100, 450, 100, 100, "rect01", 20);
+                rect2 = createRect(300, 450, 100, 100, "rect02", 40);
+                rect3 = createRect(500, 450, 100, 100, "rect03", 80);
+
+                app.stage.addChild(rect1);
+                app.stage.addChild(rect2);
+                app.stage.addChild(rect3);
+
+                app.ticker.add(gameLoop);
+            };
+
+            // CREATE FUNCTIONS
+
+            function createRect(x, y, w, h, name, speed) {
+                let rect = new PIXI.Graphics();
+
+                rect.beginFill(NORMAL);
+                rect.drawRect(
+                    x,
+                    y,
+                    w,
+                    h
+                );
+                rect.endFill();
+                rect.interactive = true;
+                rect.buttonMode = true;
+
+                rect.on("pointerup", doPointerUp);
+                rect.on("pointerdown", doPointerDown);
+                rect.on("pointerover", doPointerOver);
+                rect.on("pointerout", doPointerOut);
+                rect.on("pointerupoutside", doPointerUpOutside);
+
+                rect.name = name;
+                rect.speed = speed;
+
+                return(rect);
+            }
+
+            // POINTER FUNCTIONS
+
+            function doPointerUp() {
+                if (pointerIsOver) {
+                    this.tint = OVER;
+                    this.y = this.y - this.speed;
+                } else {
+                    this.tint = NORMAL;
+                }
+                pointerIsDown = false;
+            }
+
+            function doPointerDown() {
+                this.tint = DOWN;
+                pointerIsDown = true;
+            }
+
+            function doPointerOver() {
+                if(!pointerIsDown) {
+                    this.tint = OVER;
+                    pointerIsOver = true;
+                }
+            }
+
+            function doPointerOut() {
+                if (!pointerIsDown) {
+                    this.tint = NORMAL;
+                    pointerIsOver = false;
+                }
+            }
+
+            function doPointerUpOutside() {
+                this.tint = NORMAL;
+                pointerIsDown = false;
+                pointerIsOver = false;
+            }
+
+            // OTHER FUNCTIONS
+
+            function gameLoop() {}
+        </script>
+    </head>
+    <body>
+        <div id="gameDiv"></div>
+    </body>
+</html>
